@@ -1,11 +1,5 @@
 ﻿using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
-using System;
-using OpenQA.Selenium;
-using OpenQA.Selenium.Chrome;
-using System;
-using System.Linq;
-using System.Net.NetworkInformation;
 using ManagedNativeWifi;
 
 class CFEAutoNetLogin
