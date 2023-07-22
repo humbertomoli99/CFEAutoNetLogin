@@ -2,7 +2,7 @@
 using OpenQA.Selenium.Chrome;
 using ManagedNativeWifi;
 
-class CFEAutoNetLogin
+class ReauthCfeConnect
 {
     static void Main(string[] args)
     {
