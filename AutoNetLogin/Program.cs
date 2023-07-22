@@ -20,13 +20,19 @@ class CFEAutoNetLogin
         string expectedSSID = "CFE Internet"; // Agrega aquí el SSID esperado para la red WiFi
         if (currentSSID == expectedSSID)
         {
+            // Ruta al ejecutable del ChromeDriver
+            string chromeDriverPath = "C:\\chromedriver_win32\\chromedriver.exe";
+            var chromeDriverService = ChromeDriverService.CreateDefaultService(chromeDriverPath);
+
+            chromeDriverService.HideCommandPromptWindow = true;
+
             // Configura las opciones de Chrome
             ChromeOptions options = new ChromeOptions();
             options.AddArgument("--headless"); // Ejecuta el navegador en modo headless (sin interfaz gráfica)
             options.AddArgument("--window-size=1920x1080"); // Tamaño de ventana (opcional)
 
             // Configura el directorio donde se encuentra el ChromeDriver.exe
-            ChromeDriver driver = new ChromeDriver("C:\\chromedriver_win32\\chromedriver.exe", options);
+            ChromeDriver driver = new ChromeDriver(chromeDriverService, options);
 
             // Navega a la página de inicio de sesión
             driver.Navigate().GoToUrl("https://acs.cfeteit.gob.mx:19008/portalpage/817e256e-2bf1-45a1-a504-9a6b8e17018f/20210905130555/pc/auth.html?apmac=30c50fd52c10&uaddress=10.1.1.68&umac=000db0049c8e&authType=2&lang=en_US&ssid=Q0ZFIEludGVybmV0&pushPageId=e2c9d848-3565-4065-b796-05fb3b0dfa6a");
