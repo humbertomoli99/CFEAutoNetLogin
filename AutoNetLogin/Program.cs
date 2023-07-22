@@ -18,6 +18,7 @@ class CFEAutoNetLogin
             string chromeDriverPath = "C:\\chromedriver_win32\\chromedriver.exe";
             var chromeDriverService = ChromeDriverService.CreateDefaultService(chromeDriverPath);
 
+            //Ocultando la terminal de chromedriver
             chromeDriverService.HideCommandPromptWindow = true;
 
             // Configura las opciones de Chrome
