@@ -1,6 +1,8 @@
 ﻿using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using ManagedNativeWifi;
+using System;
+using System.Linq;
 
 class ReauthCfeConnect
 {
@@ -14,41 +16,45 @@ class ReauthCfeConnect
         string expectedSSID = "CFE Internet"; // Agrega aquí el SSID esperado para la red WiFi
         if (currentSSID == expectedSSID)
         {
-            // Ruta al ejecutable del ChromeDriver
-            string chromeDriverPath = "C:\\chromedriver_win32\\chromedriver.exe";
-            var chromeDriverService = ChromeDriverService.CreateDefaultService(chromeDriverPath);
+            // Detecta si hay un portal cautivo y obtiene la URL de redirección si es necesario
+            string captivePortalRedirectUrl = DetectCaptivePortalAndRedirect();
+            if (!string.IsNullOrEmpty(captivePortalRedirectUrl))
+            {
+                // Realizar acciones específicas para la redirección del portal cautivo si es necesario
+                // Por ejemplo, navegar a la URL de redirección o realizar una acción especial
+                Console.WriteLine("Portal cautivo detectado. Redirigiendo a: " + captivePortalRedirectUrl);
 
-            //Ocultando la terminal de chromedriver
-            chromeDriverService.HideCommandPromptWindow = true;
+                // Ruta al ejecutable del ChromeDriver
+                string chromeDriverPath = "C:\\chromedriver_win32\\chromedriver.exe";
+                var chromeDriverService = ChromeDriverService.CreateDefaultService(chromeDriverPath);
 
-            // Configura las opciones de Chrome
-            ChromeOptions options = new ChromeOptions();
-            options.AddArgument("--headless"); // Ejecuta el navegador en modo headless (sin interfaz gráfica)
-            options.AddArgument("--window-size=1920x1080"); // Tamaño de ventana (opcional)
+                // Ocultando la terminal de chromedriver
+                chromeDriverService.HideCommandPromptWindow = true;
 
-            // Configura el directorio donde se encuentra el ChromeDriver.exe
-            ChromeDriver driver = new ChromeDriver(chromeDriverService, options);
+                // Configura las opciones de Chrome
+                ChromeOptions options = new ChromeOptions();
+                options.AddArgument("--headless"); // Ejecuta el navegador en modo headless (sin interfaz gráfica)
+                options.AddArgument("--window-size=1920x1080"); // Tamaño de ventana (opcional)
 
-            // Navega a la página de inicio de sesión
-            driver.Navigate().GoToUrl("https://acs.cfeteit.gob.mx:19008/portalpage/817e256e-2bf1-45a1-a504-9a6b8e17018f/20210905130555/pc/auth.html?apmac=30c50fd52c10&uaddress=10.1.1.68&umac=000db0049c8e&authType=2&lang=en_US&ssid=Q0ZFIEludGVybmV0&pushPageId=e2c9d848-3565-4065-b796-05fb3b0dfa6a");
+                // Configura el directorio donde se encuentra el ChromeDriver.exe
+                ChromeDriver driver = new ChromeDriver(chromeDriverService, options);
 
-            // Encuentra el elemento <label> con 'for="option-aceptar"'
-            IWebElement labelAceptar = driver.FindElement(By.CssSelector("label[for='option-aceptar']"));
+                // Navega a la página de inicio de sesión para ir a esa página y hacer el proceso de reconexión
+                driver.Navigate().GoToUrl(captivePortalRedirectUrl);
 
-            // Hacer clic en el elemento <label>
-            labelAceptar.Click();
+                // A continuación, puedes continuar con el proceso de reconexión o las acciones necesarias para completar el inicio de sesión en la red cautiva.
 
-            // Encuentra el elemento <input> con 'id="annoyBtn"'
-            IWebElement btnEntrar = driver.FindElement(By.Id("annoyBtn"));
+                // Espera un poco para asegurarse de que la conexión se haya establecido correctamente
+                System.Threading.Thread.Sleep(5000); // 5000 milisegundos = 5 segundos
 
-            // Hacer clic en el botón "Entrar"
-            btnEntrar.Click();
-
-            // Espera un poco para asegurarse de que la conexión se haya establecido correctamente
-            System.Threading.Thread.Sleep(5000); // 5000 milisegundos = 5 segundos
-
-            // Cierra el navegador
-            driver.Quit();
+                // Cierra el navegador
+                driver.Quit();
+            }
+            else
+            {
+                // Continuar con el proceso normal de inicio de sesión, ya que no se detectó un portal cautivo
+                Console.WriteLine("No se detectó un portal cautivo.");
+            }
         }
         else
         {
@@ -70,5 +76,32 @@ class ReauthCfeConnect
             Console.WriteLine("Error al obtener el nombre de la red WiFi: " + ex.Message);
             return string.Empty;
         }
+    }
+
+    // Función para detectar un portal cautivo y obtener la URL de redirección si es necesario
+    static string DetectCaptivePortalAndRedirect()
+    {
+        using (var httpClient = new HttpClient())
+        {
+            try
+            {
+                HttpResponseMessage response = httpClient.GetAsync("http://clients3.google.com/generate_204").Result;
+                if (!response.IsSuccessStatusCode)
+                {
+                    // Se ha detectado un portal cautivo
+                    // Intentamos obtener la URL de redirección
+                    Uri redirectUri = response.Headers.Location;
+                    if (redirectUri != null)
+                    {
+                        return redirectUri.AbsoluteUri;
+                    }
+                }
+            }
+            catch
+            {
+                // Manejo de errores si la detección del portal cautivo falla
+            }
+        }
+        return null;
     }
 }
