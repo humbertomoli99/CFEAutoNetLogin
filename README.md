@@ -1,4 +1,4 @@
-# CFEAutoNetLogin
+# CFEReauthConnect
 ## Descripción
 CFEAutoNetLogin es una aplicación de consola desarrollada en C# que permite automatizar el proceso de inicio de sesión en la red WiFi proporcionada por CFE (Comisión Federal de Electricidad) para acceder a Internet de forma gratuita en puntos de atención prioritaria y/o sitios públicos.
 
