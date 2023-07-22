@@ -20,9 +20,12 @@ class CFEAutoNetLogin
         string expectedSSID = "CFE Internet"; // Agrega aquí el SSID esperado para la red WiFi
         if (currentSSID == expectedSSID)
         {
-            // Configura el directorio donde se encuentra el ChromeDriver.exe
+            // Configura las opciones de Chrome
             ChromeOptions options = new ChromeOptions();
-            options.AddArgument("--start-maximized"); // Maximiza la ventana del navegador (opcional)
+            options.AddArgument("--headless"); // Ejecuta el navegador en modo headless (sin interfaz gráfica)
+            options.AddArgument("--window-size=1920x1080"); // Tamaño de ventana (opcional)
+
+            // Configura el directorio donde se encuentra el ChromeDriver.exe
             ChromeDriver driver = new ChromeDriver("C:\\chromedriver_win32\\chromedriver.exe", options);
 
             // Navega a la página de inicio de sesión
